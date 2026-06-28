@@ -1,48 +1,13 @@
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function isAuth()       { return request.auth != null; }
-    function isOwner(uid)   { return isAuth() && request.auth.uid == uid; }
-
-    function isStringOrNull(val) {
-      return val == null || (val is string && val.size() <= 500);
-    }
-    function isValidAvatarUrl(val) {
-      return val == null || (
-        val is string && val.size() <= 2000
-        && val.matches('https://.*\\.supabase\\.co/.*')
-      );
-    }
-
-    // ── users/{uid} ──────────────────────────────────────────────
+    // Foydalanuvchi profili:
+    // - Hamma o'qiy oladi (boshqa ilovalar ID bo'yicha lookup qilishi uchun)
+    // - Faqat o'zi yoza oladi
     match /users/{uid} {
-
-      // Faqat egasi o'z profilini o'qiy oladi
-      allow read: if isOwner(uid);
-
-      // Yaratish — ro'yxatdan o'tishda
-      allow create: if isOwner(uid)
-        && request.resource.data.uid == uid
-        && request.resource.data.email is string
-        && isStringOrNull(request.resource.data.get('fullName', null))
-        && isValidAvatarUrl(request.resource.data.get('avatarUrl', null));
-
-      // Yangilash — faqat fullName va avatarUrl o'zgartiriladi
-      allow update: if isOwner(uid)
-        && request.resource.data.uid       == resource.data.uid
-        && request.resource.data.email     == resource.data.email
-        && request.resource.data.createdAt == resource.data.createdAt
-        && isStringOrNull(request.resource.data.get('fullName', null))
-        && isValidAvatarUrl(request.resource.data.get('avatarUrl', null));
-
-      allow delete: if false;
-    }
-
-    // Boshqa hamma narsa yopiq
-    match /{document=**} {
-      allow read, write: if false;
+      allow read:  if true;
+      allow write: if request.auth != null && request.auth.uid == uid;
     }
   }
 }

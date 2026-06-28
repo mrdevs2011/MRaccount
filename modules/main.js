@@ -4,15 +4,14 @@ import { $, toast, copyToClipboard } from './utils.js';
 const pageAuth    = $('pageAuth');
 const pageProfile = $('pageProfile');
 
-// ── Sahifalar almashinuvi ────────────────────────────────────────
-function showAuth()    { pageAuth.style.display = 'flex';    pageProfile.style.display = 'none'; }
-function showProfile() { pageAuth.style.display = 'none';    pageProfile.style.display = 'flex'; }
+function showAuth()    { pageAuth.style.display = 'flex'; pageProfile.style.display = 'none'; }
+function showProfile() { pageAuth.style.display = 'none'; pageProfile.style.display = 'flex'; }
 
-// ── Tablar ──────────────────────────────────────────────────────
+// ── Tablar ───────────────────────────────────────────────────────
 $('tabLogin').onclick = () => {
   $('tabLogin').classList.add('active');
   $('tabRegister').classList.remove('active');
-  $('loginForm').style.display = 'flex';
+  $('loginForm').style.display    = 'flex';
   $('registerForm').style.display = 'none';
   $('authStatus').textContent = '';
 };
@@ -20,17 +19,17 @@ $('tabRegister').onclick = () => {
   $('tabRegister').classList.add('active');
   $('tabLogin').classList.remove('active');
   $('registerForm').style.display = 'flex';
-  $('loginForm').style.display = 'none';
+  $('loginForm').style.display    = 'none';
   $('authStatus').textContent = '';
 };
 
-// ── Kirish ──────────────────────────────────────────────────────
+// ── Kirish ───────────────────────────────────────────────────────
 $('loginForm').onsubmit = async e => {
   e.preventDefault();
   const btn = $('loginBtn');
   btn.disabled = true; btn.textContent = 'Kirilmoqda...';
   try {
-    await loginUser($('loginEmail').value.trim(), $('loginPassword').value);
+    await loginUser($('loginUsername').value.trim(), $('loginPassword').value);
   } catch (err) {
     showError(errMsg(err));
   } finally {
@@ -38,14 +37,14 @@ $('loginForm').onsubmit = async e => {
   }
 };
 
-// ── Ro'yxatdan o'tish ───────────────────────────────────────────
+// ── Ro'yxatdan o'tish ────────────────────────────────────────────
 $('registerForm').onsubmit = async e => {
   e.preventDefault();
   const btn = $('registerBtn');
   btn.disabled = true; btn.textContent = "Ro'yxatdan o'tilmoqda...";
   try {
     await registerUser(
-      $('regEmail').value.trim(),
+      $('regUsername').value.trim(),
       $('regPassword').value,
       $('regName').value.trim(),
     );
@@ -56,50 +55,40 @@ $('registerForm').onsubmit = async e => {
   }
 };
 
-// ── Profil sahifasini to'ldirish ────────────────────────────────
+// ── Profilni to'ldirish ──────────────────────────────────────────
 async function fillProfile(user) {
-  $('profileId').textContent    = user.uid;
-  $('profileEmail').textContent = user.email || '';
-
   try {
-    const profile = await getProfile(user.uid);
-    const name = profile?.fullName || user.email?.split('@')[0] || '';
-    $('profileName').textContent = name;
-    $('editName').value = name;
+    const p = await getProfile(user.uid);
+    const name = p?.name || '';
 
-    // Faqat initsial ko'rsatiladi (rasm yo'q)
-    $('profileFallback').textContent = (name || user.email || '?')[0].toUpperCase();
-    $('profileFallback').style.display = 'flex';
+    $('profileName').textContent     = name;
+    $('profileUsername').textContent = '@' + (p?.username || '');
+    $('profileId').textContent       = user.uid;
+    $('profileFallback').textContent = (name || '?')[0].toUpperCase();
+    $('editName').value              = name;
   } catch (_) {
-    $('profileFallback').textContent = (user.email || '?')[0].toUpperCase();
-    $('profileFallback').style.display = 'flex';
+    $('profileId').textContent       = user.uid;
+    $('profileFallback').textContent = '?';
   }
 }
 
-// ── Auth holati ─────────────────────────────────────────────────
+// ── Auth holati ──────────────────────────────────────────────────
 onAuth(async user => {
-  if (user) {
-    await fillProfile(user);
-    showProfile();
-  } else {
-    showAuth();
-  }
+  if (user) { await fillProfile(user); showProfile(); }
+  else       { showAuth(); }
 });
 
-// ── ID nusxalash ────────────────────────────────────────────────
+// ── ID nusxalash ─────────────────────────────────────────────────
 $('copyIdBtn').onclick = () => {
-  const id = $('profileId').textContent;
-  copyToClipboard(id);
+  copyToClipboard($('profileId').textContent);
   const btn = $('copyIdBtn');
-  btn.innerHTML = '✓';
-  btn.style.color = '#3fb950';
-  setTimeout(() => {
-    btn.style.color = '';
-    btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
-  }, 2000);
+  const orig = btn.innerHTML;
+  btn.textContent = '✓ Nusxalandi!';
+  btn.classList.add('copied');
+  setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2000);
 };
 
-// ── Ism saqlash ─────────────────────────────────────────────────
+// ── Ism saqlash ──────────────────────────────────────────────────
 $('saveNameBtn').onclick = async () => {
   const name = $('editName').value.trim();
   const { auth } = await import('./config.js');
@@ -107,9 +96,9 @@ $('saveNameBtn').onclick = async () => {
   if (!user) return;
   try {
     $('saveNameBtn').disabled = true; $('saveNameBtn').textContent = '...';
-    await updateProfile(user.uid, { fullName: name });
-    $('profileName').textContent = name || user.email;
-    $('profileFallback').textContent = (name || user.email || '?')[0].toUpperCase();
+    await updateProfile(user.uid, { name });
+    $('profileName').textContent     = name;
+    $('profileFallback').textContent = (name || '?')[0].toUpperCase();
     toast('Saqlandi ✓', 'success');
   } catch (err) {
     toast('Xato: ' + err.message, 'error');
@@ -118,12 +107,10 @@ $('saveNameBtn').onclick = async () => {
   }
 };
 
-// ── Chiqish ─────────────────────────────────────────────────────
-$('logoutBtn').onclick = async () => {
-  await logoutUser();
-};
+// ── Chiqish ──────────────────────────────────────────────────────
+$('logoutBtn').onclick = async () => { await logoutUser(); };
 
-// ── Xato xabarlari ──────────────────────────────────────────────
+// ── Xato xabarlari ───────────────────────────────────────────────
 function showError(msg) {
   const el = $('authStatus');
   el.textContent = msg;
@@ -132,14 +119,11 @@ function showError(msg) {
 
 function errMsg(err) {
   const map = {
-    'auth/invalid-credential':       'Email yoki parol noto\'g\'ri',
-    'auth/email-already-in-use':     'Bu email allaqachon ro\'yxatdan o\'tgan',
-    'auth/weak-password':            'Parol kamida 6 ta belgi bo\'lishi kerak',
-    'auth/invalid-email':            'Email formati noto\'g\'ri',
-    'auth/user-not-found':           'Foydalanuvchi topilmadi',
-    'auth/too-many-requests':        'Ko\'p urinish. Biroz kutib turing',
-    'auth/network-request-failed':   'Internet aloqasi yo\'q',
+    'auth/invalid-credential':     "Username yoki parol noto'g'ri",
+    'auth/email-already-in-use':   'Bu username band, boshqasini tanlang',
+    'auth/weak-password':          "Parol kamida 6 ta belgi bo'lishi kerak",
+    'auth/too-many-requests':      "Ko'p urinish. Biroz kutib turing",
+    'auth/network-request-failed': "Internet aloqasi yo'q",
   };
-  const code = err.code || '';
-  return map[code] || err.message;
+  return map[err.code] || err.message;
 }

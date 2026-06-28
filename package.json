@@ -1,5 +1,1 @@
-{
-  "name": "mraccount",
-  "private": true,
-  "version": "2.0.0"
-}
+{ "name": "mraccount", "version": "4.0.0", "private": true }

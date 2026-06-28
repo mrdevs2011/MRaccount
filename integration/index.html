@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MRaccount Integratsiya — Misol</title>
+<style>
+  /* ─── Umumiy ──────────────────────────────────────────── */
+  :root {
+    --bg:     #0d1117; --card:  #161b22; --border: #2a313c;
+    --text:   #e6edf3; --text2: #8b949e; --accent: #5b8ef5;
+    --green:  #3fb950; --red:   #f85149;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+         background: var(--bg); color: var(--text); min-height: 100vh; padding: 40px 16px; }
+
+  h1 { font-size: 22px; margin-bottom: 6px; }
+  .sub { font-size: 14px; color: var(--text2); margin-bottom: 40px; }
+
+  /* ─── Demo App ────────────────────────────────────────── */
+  .demo-card {
+    max-width: 420px; margin: 0 auto 48px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 32px 28px;
+  }
+  .demo-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .demo-sub   { font-size: 13px; color: var(--text2); margin-bottom: 24px; }
+
+  /* MRaccount kirish tugmasi */
+  .mra-btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    width: 100%; padding: 13px 18px;
+    background: #5b8ef5; color: #fff;
+    border: none; border-radius: 10px;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+    transition: opacity .15s;
+  }
+  .mra-btn:hover { opacity: .88; }
+  .mra-btn svg rect { fill: rgba(255,255,255,.2); }
+
+  /* Kirgan foydalanuvchi */
+  .user-box {
+    display: none; margin-top: 20px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px;
+  }
+  .user-box.visible { display: block; }
+  .user-name  { font-size: 16px; font-weight: 700; }
+  .user-uname { font-size: 13px; color: var(--text2); margin-top: 3px; }
+  .user-id    { font-size: 11px; color: var(--text2); margin-top: 8px;
+                font-family: monospace; word-break: break-all; }
+  .logout-sm  { margin-top: 14px; font-size: 12px; color: var(--red);
+                cursor: pointer; border: none; background: none; padding: 0; }
+
+  /* ─── Modal ───────────────────────────────────────────── */
+  .overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.7); z-index: 100;
+    align-items: center; justify-content: center;
+  }
+  .overlay.open { display: flex; }
+  .modal {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 28px; width: 100%; max-width: 360px; margin: 16px;
+  }
+  .modal h2 { font-size: 17px; margin-bottom: 6px; }
+  .modal p  { font-size: 13px; color: var(--text2); margin-bottom: 20px; }
+  .modal input {
+    width: 100%; padding: 12px 14px;
+    border-radius: 10px; border: 1px solid var(--border);
+    background: var(--bg); color: var(--text);
+    font-size: 14px; margin-bottom: 12px;
+    font-family: monospace;
+  }
+  .modal input:focus { outline: none; border-color: var(--accent); }
+  .modal-btns { display: flex; gap: 8px; }
+  .confirm-btn {
+    flex: 1; padding: 12px;
+    background: var(--accent); color: #fff;
+    border: none; border-radius: 10px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: opacity .15s;
+  }
+  .confirm-btn:disabled { opacity: .6; cursor: not-allowed; }
+  .cancel-btn {
+    padding: 12px 18px;
+    background: transparent; color: var(--text2);
+    border: 1px solid var(--border); border-radius: 10px;
+    font-size: 14px; cursor: pointer; transition: border-color .15s;
+  }
+  .cancel-btn:hover { border-color: var(--text2); }
+  .modal-error { font-size: 13px; color: var(--red); margin-top: 10px; min-height: 18px; }
+
+  /* ─── Kod bloki ───────────────────────────────────────── */
+  .section { max-width: 700px; margin: 0 auto; }
+  .section h2 { font-size: 18px; margin-bottom: 8px; }
+  .section p  { font-size: 14px; color: var(--text2); margin-bottom: 20px; line-height: 1.6; }
+  pre {
+    background: #010409; border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px; overflow-x: auto;
+    font-size: 13px; line-height: 1.7; position: relative;
+  }
+  code { font-family: "SF Mono", "Fira Code", Consolas, monospace; color: #e6edf3; }
+  .kw  { color: #ff7b72; } /* keyword */
+  .fn  { color: #d2a8ff; } /* function */
+  .st  { color: #a5d6ff; } /* string */
+  .cm  { color: #8b949e; } /* comment */
+  .copy-code {
+    position: absolute; top: 12px; right: 12px;
+    padding: 5px 12px; background: var(--card);
+    border: 1px solid var(--border); border-radius: 7px;
+    color: var(--text2); font-size: 12px; cursor: pointer;
+    transition: all .15s;
+  }
+  .copy-code:hover { border-color: var(--accent); color: var(--accent); }
+  .step {
+    display: flex; gap: 12px; margin-bottom: 32px;
+  }
+  .step-num {
+    width: 28px; height: 28px; flex-shrink: 0;
+    background: var(--accent); color: #fff;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; margin-top: 2px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── Demo ──────────────────────────────────────────────────── -->
+<div style="max-width:700px;margin:0 auto">
+  <h1>MRaccount Integratsiya</h1>
+  <p class="sub">Quyida jonli demo va copy-paste kod bor. Shu koddan foydalanib istalgan ilovaga MRaccount login qo'shishingiz mumkin.</p>
+</div>
+
+<div class="demo-card">
+  <div class="demo-title">🎮 MR Games — misol ilova</div>
+  <div class="demo-sub">Bu boshqa bir ilova. Unda MRaccount orqali kirish ishlaydi.</div>
+
+  <button class="mra-btn" id="openModalBtn">
+    <svg width="22" height="22" viewBox="0 0 36 36" fill="none">
+      <rect width="36" height="36" rx="8" fill="rgba(255,255,255,.2)"/>
+      <text x="18" y="25" text-anchor="middle" font-size="15" font-weight="700"
+            fill="#fff" font-family="system-ui">MR</text>
+    </svg>
+    MRaccount bilan kirish
+  </button>
+
+  <div class="user-box" id="userBox">
+    <div class="user-name"  id="uName"></div>
+    <div class="user-uname" id="uUsername"></div>
+    <div class="user-id"    id="uId"></div>
+    <button class="logout-sm" id="logoutSm">Chiqish</button>
+  </div>
+</div>
+
+<!-- ─── Modal ─────────────────────────────────────────────────── -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <h2>MRaccount bilan kirish</h2>
+    <p>MRaccount ID ingizni kiriting.<br>
+       ID ni MRaccount profilingizdan nusxalab olishingiz mumkin.</p>
+    <input id="idInput" placeholder="MRaccount ID (uid)" autocomplete="off" spellcheck="false">
+    <div class="modal-btns">
+      <button class="confirm-btn" id="confirmBtn">Kirish</button>
+      <button class="cancel-btn"  id="cancelBtn">Bekor</button>
+    </div>
+    <div class="modal-error" id="modalError"></div>
+  </div>
+</div>
+
+<!-- ─── Kod ───────────────────────────────────────────────────── -->
+<div class="section">
+  <h2>Qanday ishlatish</h2>
+  <p>Quyidagi 3 qadamni bajaring. Hammasi — faqat HTML + JavaScript, hech qanday kutubxona kerak emas.</p>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div style="flex:1">
+      <p style="color:var(--text);margin-bottom:12px;font-weight:600">Lookup funksiyasini qo'shing</p>
+      <pre><button class="copy-code" onclick="copyCode(this)">Nusxalash</button><code><span class="cm">// MRaccount ID bo'yicha foydalanuvchini olish</span>
+<span class="kw">async function</span> <span class="fn">getMRaccountUser</span>(id) {
+  <span class="kw">const</span> url = <span class="st">`https://firestore.googleapis.com/v1/projects/</span>
+<span class="st">mrplatform-9cdc0/databases/(default)/documents/users/${id}`</span>;
+
+  <span class="kw">const</span> res = <span class="kw">await</span> <span class="fn">fetch</span>(url);
+  <span class="kw">if</span> (!res.ok) <span class="kw">throw new</span> <span class="fn">Error</span>(<span class="st">'Foydalanuvchi topilmadi'</span>);
+
+  <span class="kw">const</span> data = <span class="kw">await</span> res.<span class="fn">json</span>();
+  <span class="kw">if</span> (!data.fields) <span class="kw">throw new</span> <span class="fn">Error</span>(<span class="st">'Foydalanuvchi topilmadi'</span>);
+
+  <span class="kw">return</span> {
+    id,
+    name:     data.fields?.name?.stringValue     || <span class="st">''</span>,
+    username: data.fields?.username?.stringValue || <span class="st">''</span>,
+  };
+}</code></pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div style="flex:1">
+      <p style="color:var(--text);margin-bottom:12px;font-weight:600">Tugma va modal qo'shing</p>
+      <pre><button class="copy-code" onclick="copyCode(this)">Nusxalash</button><code><span class="cm">&lt;!-- Tugma --&gt;</span>
+&lt;<span class="kw">button</span> <span class="fn">onclick</span>=<span class="st">"document.getElementById('mraModal').style.display='flex'"</span>&gt;
+  MRaccount bilan kirish
+&lt;/button&gt;
+
+<span class="cm">&lt;!-- Modal --&gt;</span>
+&lt;<span class="kw">div</span> <span class="fn">id</span>=<span class="st">"mraModal"</span> <span class="fn">style</span>=<span class="st">"display:none;position:fixed;inset:0;
+background:rgba(0,0,0,.7);align-items:center;justify-content:center;z-index:999"</span>&gt;
+  &lt;<span class="kw">div</span> <span class="fn">style</span>=<span class="st">"background:#161b22;border-radius:12px;padding:28px;width:340px"</span>&gt;
+    &lt;<span class="kw">h3</span>&gt;MRaccount ID kiriting&lt;/<span class="kw">h3</span>&gt;
+    &lt;<span class="kw">input</span> <span class="fn">id</span>=<span class="st">"mraIdInput"</span> <span class="fn">placeholder</span>=<span class="st">"MRaccount ID"</span>
+           <span class="fn">style</span>=<span class="st">"width:100%;margin:12px 0;padding:10px;border-radius:8px;
+border:1px solid #2a313c;background:#0d1117;color:#fff;font-family:monospace"</span>&gt;
+    &lt;<span class="kw">button</span> <span class="fn">onclick</span>=<span class="st">"mraLogin()"</span>&gt;Kirish&lt;/<span class="kw">button</span>&gt;
+    &lt;<span class="kw">button</span> <span class="fn">onclick</span>=<span class="st">"document.getElementById('mraModal').style.display='none'"</span>&gt;Bekor&lt;/<span class="kw">button</span>&gt;
+    &lt;<span class="kw">div</span> <span class="fn">id</span>=<span class="st">"mraError"</span> <span class="fn">style</span>=<span class="st">"color:#f85149;font-size:13px;margin-top:8px"</span>&gt;&lt;/<span class="kw">div</span>&gt;
+  &lt;/<span class="kw">div</span>&gt;
+&lt;/<span class="kw">div</span>&gt;</code></pre>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div style="flex:1">
+      <p style="color:var(--text);margin-bottom:12px;font-weight:600">Login funksiyasini ulang</p>
+      <pre><button class="copy-code" onclick="copyCode(this)">Nusxalash</button><code><span class="kw">async function</span> <span class="fn">mraLogin</span>() {
+  <span class="kw">const</span> id    = document.<span class="fn">getElementById</span>(<span class="st">'mraIdInput'</span>).value.<span class="fn">trim</span>();
+  <span class="kw">const</span> errEl = document.<span class="fn">getElementById</span>(<span class="st">'mraError'</span>);
+  errEl.textContent = <span class="st">''</span>;
+
+  <span class="kw">if</span> (!id) { errEl.textContent = <span class="st">'ID kiriting'</span>; <span class="kw">return</span>; }
+
+  <span class="kw">try</span> {
+    <span class="kw">const</span> user = <span class="kw">await</span> <span class="fn">getMRaccountUser</span>(id);
+
+    <span class="cm">// ✅ Mana shu yerda foydalanuvchi bilan ishlaysiz:</span>
+    console.<span class="fn">log</span>(user.name);       <span class="cm">// "Jasur Karimov"</span>
+    console.<span class="fn">log</span>(user.username);   <span class="cm">// "jasur_uz"</span>
+    console.<span class="fn">log</span>(user.id);         <span class="cm">// "abc123..."</span>
+
+    document.<span class="fn">getElementById</span>(<span class="st">'mraModal'</span>).style.display = <span class="st">'none'</span>;
+  } <span class="kw">catch</span> (e) {
+    errEl.textContent = e.message;
+  }
+}</code></pre>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── Lookup funksiyasi ────────────────────────────────────────────
+async function getMRaccountUser(id) {
+  const url = `https://firestore.googleapis.com/v1/projects/mrplatform-9cdc0/databases/(default)/documents/users/${id}`;
+  const res  = await fetch(url);
+  if (!res.ok) throw new Error("Foydalanuvchi topilmadi");
+  const data = await res.json();
+  if (!data.fields) throw new Error("Foydalanuvchi topilmadi");
+  return {
+    id,
+    name:     data.fields?.name?.stringValue     || '',
+    username: data.fields?.username?.stringValue || '',
+  };
+}
+
+// ── Modal ────────────────────────────────────────────────────────
+const overlay    = document.getElementById('overlay');
+const idInput    = document.getElementById('idInput');
+const confirmBtn = document.getElementById('confirmBtn');
+const modalError = document.getElementById('modalError');
+const userBox    = document.getElementById('userBox');
+
+document.getElementById('openModalBtn').onclick = () => {
+  overlay.classList.add('open');
+  idInput.focus();
+  modalError.textContent = '';
+};
+document.getElementById('cancelBtn').onclick = () => {
+  overlay.classList.remove('open');
+};
+overlay.onclick = e => { if (e.target === overlay) overlay.classList.remove('open'); };
+
+async function doLogin() {
+  const id = idInput.value.trim();
+  modalError.textContent = '';
+  if (!id) { modalError.textContent = 'ID kiriting'; return; }
+
+  confirmBtn.disabled = true; confirmBtn.textContent = 'Tekshirilmoqda...';
+  try {
+    const user = await getMRaccountUser(id);
+    overlay.classList.remove('open');
+    idInput.value = '';
+
+    document.getElementById('uName').textContent     = user.name;
+    document.getElementById('uUsername').textContent  = '@' + user.username;
+    document.getElementById('uId').textContent        = 'ID: ' + user.id;
+    userBox.classList.add('visible');
+    document.getElementById('openModalBtn').style.display = 'none';
+  } catch (e) {
+    modalError.textContent = e.message;
+  } finally {
+    confirmBtn.disabled = false; confirmBtn.textContent = 'Kirish';
+  }
+}
+
+confirmBtn.onclick = doLogin;
+idInput.onkeydown  = e => { if (e.key === 'Enter') doLogin(); };
+
+document.getElementById('logoutSm').onclick = () => {
+  userBox.classList.remove('visible');
+  document.getElementById('openModalBtn').style.display = '';
+};
+
+// ── Kod nusxalash ────────────────────────────────────────────────
+function copyCode(btn) {
+  const pre  = btn.parentElement;
+  const text = pre.innerText.replace('Nusxalash\n', '').replace('Nusxalandi!\n', '');
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Nusxalandi!';
+    setTimeout(() => btn.textContent = 'Nusxalash', 2000);
+  });
+}
+</script>
+</body>
+</html>

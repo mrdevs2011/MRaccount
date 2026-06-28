@@ -9,23 +9,34 @@ import {
   doc, setDoc, getDoc, updateDoc, serverTimestamp,
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-// Ro'yxatdan o'tish — avtomatik MRaccount ID beriladi (Firebase UID)
-export async function registerUser(email, password, fullName) {
-  const cred = await createUserWithEmailAndPassword(auth, email, password);
+// Username ichida saqlanadi, Firebase uchun fake email ishlatiladi
+function toEmail(username) {
+  return `${username}@mrplatform.uz`;
+}
+
+export async function registerUser(username, password, name) {
+  const uname = username.toLowerCase().trim();
+
+  if (!/^[a-z0-9_]{3,20}$/.test(uname)) {
+    throw new Error('Username: 3-20 belgi, faqat harflar, raqamlar, _');
+  }
+
+  const cred = await createUserWithEmailAndPassword(auth, toEmail(uname), password);
   const uid  = cred.user.uid;
 
   await setDoc(doc(db, 'users', uid), {
     uid,
-    email,
-    fullName: fullName || '',
+    username: uname,
+    name:     name.trim() || uname,
     createdAt: serverTimestamp(),
   });
 
   return cred.user;
 }
 
-export async function loginUser(email, password) {
-  const cred = await signInWithEmailAndPassword(auth, email, password);
+export async function loginUser(username, password) {
+  const uname = username.toLowerCase().trim();
+  const cred  = await signInWithEmailAndPassword(auth, toEmail(uname), password);
   return cred.user;
 }
 

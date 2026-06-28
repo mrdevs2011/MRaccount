@@ -8,13 +8,15 @@
 </head>
 <body>
 
-<!-- ── AUTH SAHIFASI ─────────────────────────────────────────────── -->
+<!-- ── AUTH SAHIFASI ──────────────────────────────────────────── -->
 <div id="pageAuth" class="page">
   <div class="card">
+
     <div class="logo">
       <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
         <rect width="36" height="36" rx="10" fill="#5b8ef5"/>
-        <text x="18" y="25" text-anchor="middle" font-size="16" font-weight="700" fill="#fff" font-family="system-ui">MR</text>
+        <text x="18" y="25" text-anchor="middle" font-size="16" font-weight="700"
+              fill="#fff" font-family="system-ui">MR</text>
       </svg>
       <span>MRaccount</span>
     </div>
@@ -22,21 +24,21 @@
 
     <div class="tabs">
       <button class="tab active" id="tabLogin">Kirish</button>
-      <button class="tab" id="tabRegister">Ro'yxatdan o'tish</button>
+      <button class="tab"        id="tabRegister">Ro'yxatdan o'tish</button>
     </div>
 
-    <!-- Kirish formasi -->
+    <!-- Kirish -->
     <form id="loginForm" class="form">
-      <input type="email" id="loginEmail" placeholder="Email" required>
-      <input type="password" id="loginPassword" placeholder="Parol" required>
+      <input id="loginUsername" type="text"     placeholder="Username"     autocomplete="username" required>
+      <input id="loginPassword" type="password" placeholder="Parol"        autocomplete="current-password" required>
       <button type="submit" class="btn" id="loginBtn">Kirish</button>
     </form>
 
-    <!-- Ro'yxatdan o'tish formasi -->
+    <!-- Ro'yxatdan o'tish -->
     <form id="registerForm" class="form" style="display:none">
-      <input type="text"     id="regName"     placeholder="To'liq ismingiz">
-      <input type="email"    id="regEmail"    placeholder="Email" required>
-      <input type="password" id="regPassword" placeholder="Parol (kamida 6 belgi)" required>
+      <input id="regName"     type="text"     placeholder="To'liq ism">
+      <input id="regUsername" type="text"     placeholder="Username (masalan: john_uz)" autocomplete="username" required>
+      <input id="regPassword" type="password" placeholder="Parol (kamida 6 belgi)"     autocomplete="new-password" required>
       <button type="submit" class="btn" id="registerBtn">Ro'yxatdan o'tish</button>
     </form>
 
@@ -44,42 +46,41 @@
   </div>
 </div>
 
-<!-- ── PROFIL SAHIFASI ───────────────────────────────────────────── -->
+<!-- ── PROFIL SAHIFASI ──────────────────────────────────────────── -->
 <div id="pageProfile" class="page" style="display:none">
   <div class="card profile-card">
 
-    <!-- Initsial avatar + ism -->
+    <!-- Avatar + ism -->
     <div class="profile-top">
-      <div class="avatar-circle">
-        <span class="avatar-fallback" id="profileFallback"></span>
-      </div>
-      <div class="profile-name-wrap">
-        <div class="profile-name" id="profileName"></div>
-        <div class="profile-email" id="profileEmail"></div>
+      <div class="avatar-fallback" id="profileFallback"></div>
+      <div>
+        <div class="profile-name"     id="profileName"></div>
+        <div class="profile-username" id="profileUsername"></div>
       </div>
     </div>
 
     <!-- MRaccount ID — asosiy narsa -->
     <div class="id-block">
       <div class="id-label">MRaccount ID</div>
-      <div class="id-row">
-        <code class="id-value" id="profileId"></code>
-        <button class="copy-btn" id="copyIdBtn" title="Nusxa olish">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-          </svg>
-        </button>
-      </div>
+      <code class="id-value" id="profileId"></code>
+      <button class="copy-btn" id="copyIdBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="9" y="9" width="13" height="13" rx="2"/>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+        ID nusxalash
+      </button>
       <div class="id-hint">
-        Boshqa MR-ilovalarda <strong>MRaccount ID</strong> so'ralganda shu qiymatni kiriting
+        Boshqa MR-ilovalarda "MRaccount bilan kirish" tugmasini bosganda
+        shu <strong>ID</strong> ni kiritasiz
       </div>
     </div>
 
     <!-- Ism tahrirlash -->
     <div class="edit-section">
-      <label class="field-label">To'liq ism</label>
+      <label class="field-label">Ismni o'zgartirish</label>
       <div class="edit-row">
-        <input type="text" id="editName" class="edit-input" placeholder="Ismingizni kiriting">
+        <input type="text" id="editName" class="edit-input" placeholder="Yangi ism">
         <button class="save-btn" id="saveNameBtn">Saqlash</button>
       </div>
     </div>
