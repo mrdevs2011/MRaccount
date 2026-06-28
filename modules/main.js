@@ -84,8 +84,7 @@ async function sendToParent(user, profile) {
 
   // Qaysi domendan kelganini tekshiramiz (xavfsizlik)
   const allowedOrigins = [
-    'https://mrgames.vercel.app',
-    'https://mrshop.vercel.app',
+    'https://mrgram.vercel.app',
     'http://localhost:3000',
     'http://localhost:5500',
     'http://127.0.0.1:5500',
