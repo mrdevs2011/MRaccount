@@ -1,4 +1,4 @@
-import { registerUser, loginUser, logoutUser, getProfile, updateProfile, updateAvatar, onAuth } from './auth.js';
+import { registerUser, loginUser, logoutUser, getProfile, updateProfile, onAuth } from './auth.js';
 import { $, toast, copyToClipboard } from './utils.js';
 
 const pageAuth    = $('pageAuth');
@@ -24,15 +24,6 @@ $('tabRegister').onclick = () => {
   $('authStatus').textContent = '';
 };
 
-// ── Avatar preview (ro'yxatdan o'tishda) ────────────────────────
-$('avatarFile').addEventListener('change', () => {
-  const file = $('avatarFile').files[0];
-  if (!file) return;
-  $('avatarPreview').src = URL.createObjectURL(file);
-  $('avatarPreview').style.display = 'block';
-  $('avatarPickInner').style.display = 'none';
-});
-
 // ── Kirish ──────────────────────────────────────────────────────
 $('loginForm').onsubmit = async e => {
   e.preventDefault();
@@ -53,12 +44,10 @@ $('registerForm').onsubmit = async e => {
   const btn = $('registerBtn');
   btn.disabled = true; btn.textContent = "Ro'yxatdan o'tilmoqda...";
   try {
-    const avatarFile = $('avatarFile').files[0] || null;
     await registerUser(
       $('regEmail').value.trim(),
       $('regPassword').value,
       $('regName').value.trim(),
-      avatarFile
     );
   } catch (err) {
     showError(errMsg(err));
@@ -78,15 +67,9 @@ async function fillProfile(user) {
     $('profileName').textContent = name;
     $('editName').value = name;
 
-    if (profile?.avatarUrl) {
-      $('profileAvatar').src = profile.avatarUrl;
-      $('profileAvatar').style.display = 'block';
-      $('profileFallback').style.display = 'none';
-    } else {
-      $('profileFallback').textContent = (name || user.email || '?')[0].toUpperCase();
-      $('profileAvatar').style.display = 'none';
-      $('profileFallback').style.display = 'flex';
-    }
+    // Faqat initsial ko'rsatiladi (rasm yo'q)
+    $('profileFallback').textContent = (name || user.email || '?')[0].toUpperCase();
+    $('profileFallback').style.display = 'flex';
   } catch (_) {
     $('profileFallback').textContent = (user.email || '?')[0].toUpperCase();
     $('profileFallback').style.display = 'flex';
@@ -119,8 +102,6 @@ $('copyIdBtn').onclick = () => {
 // ── Ism saqlash ─────────────────────────────────────────────────
 $('saveNameBtn').onclick = async () => {
   const name = $('editName').value.trim();
-  const { currentUser } = (await import('./config.js')).default ?? {};
-  // auth import orqali olamiz
   const { auth } = await import('./config.js');
   const user = auth.currentUser;
   if (!user) return;
@@ -128,6 +109,7 @@ $('saveNameBtn').onclick = async () => {
     $('saveNameBtn').disabled = true; $('saveNameBtn').textContent = '...';
     await updateProfile(user.uid, { fullName: name });
     $('profileName').textContent = name || user.email;
+    $('profileFallback').textContent = (name || user.email || '?')[0].toUpperCase();
     toast('Saqlandi ✓', 'success');
   } catch (err) {
     toast('Xato: ' + err.message, 'error');
@@ -135,25 +117,6 @@ $('saveNameBtn').onclick = async () => {
     $('saveNameBtn').disabled = false; $('saveNameBtn').textContent = 'Saqlash';
   }
 };
-
-// ── Avatar o'zgartirish (profil sahifasida) ──────────────────────
-$('avatarChangeInput').addEventListener('change', async () => {
-  const file = $('avatarChangeInput').files[0];
-  if (!file) return;
-  const { auth } = await import('./config.js');
-  const user = auth.currentUser;
-  if (!user) return;
-  try {
-    toast('Yuklanmoqda...', 'info');
-    const url = await updateAvatar(user.uid, file);
-    $('profileAvatar').src = url;
-    $('profileAvatar').style.display = 'block';
-    $('profileFallback').style.display = 'none';
-    toast('Rasm yangilandi ✓', 'success');
-  } catch (err) {
-    toast('Xato: ' + err.message, 'error');
-  }
-});
 
 // ── Chiqish ─────────────────────────────────────────────────────
 $('logoutBtn').onclick = async () => {

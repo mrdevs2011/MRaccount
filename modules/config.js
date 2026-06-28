@@ -15,8 +15,3 @@ const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
 export const db   = getFirestore(app);
-
-// Supabase — avatar saqlash uchun
-export const SUPABASE_URL    = 'https://olclnloqpxannznqtmvr.supabase.co';
-export const SUPABASE_KEY    = 'sb_publishable_S5hxl5otPP1m5PRQS8hedw_9AE1lcwG';
-export const SUPABASE_BUCKET = 'avatars';
