@@ -8,50 +8,100 @@
 </head>
 <body>
 
-  <div class="auth-wrap">
-    <div class="auth-card">
-      <h1 class="auth-logo">MRaccount</h1>
-      <p class="auth-sub">MR-ilovalar uchun yagona akkaunt</p>
-
-      <div class="auth-tabs">
-        <button class="auth-tab active" id="tabLogin">Kirish</button>
-        <button class="auth-tab" id="tabRegister">Ro'yxatdan o'tish</button>
-      </div>
-
-      <!-- Kirish formasi -->
-      <form id="loginForm" class="auth-form">
-        <input type="email" id="loginEmail" placeholder="Email" required>
-        <input type="password" id="loginPassword" placeholder="Parol" required>
-        <button type="submit" class="auth-btn">Kirish</button>
-      </form>
-
-      <!-- Ro'yxatdan o'tish formasi -->
-      <form id="registerForm" class="auth-form" style="display:none">
-        <!-- Profile picture tanlash -->
-        <div class="avatar-upload-wrap">
-          <label for="regAvatar" class="avatar-upload-label" id="avatarLabel">
-            <span class="avatar-placeholder" id="avatarPlaceholder">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                <circle cx="12" cy="8" r="4"/>
-                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-              </svg>
-              <span>Rasm tanlang</span>
-            </span>
-            <img id="avatarPreview" class="avatar-preview" style="display:none" alt="Avatar">
-          </label>
-          <input type="file" id="regAvatar" accept="image/*" style="display:none">
-        </div>
-
-        <input type="text" id="regName" placeholder="To'liq ism">
-        <input type="email" id="regEmail" placeholder="Email" required>
-        <input type="password" id="regPassword" placeholder="Parol" required>
-        <button type="submit" class="auth-btn">Ro'yxatdan o'tish</button>
-      </form>
-
-      <div id="authStatus" class="auth-status"></div>
+<!-- ── AUTH SAHIFASI ─────────────────────────────────────────────── -->
+<div id="pageAuth" class="page">
+  <div class="card">
+    <div class="logo">
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+        <rect width="36" height="36" rx="10" fill="#5b8ef5"/>
+        <text x="18" y="25" text-anchor="middle" font-size="16" font-weight="700" fill="#fff" font-family="system-ui">MR</text>
+      </svg>
+      <span>MRaccount</span>
     </div>
-  </div>
+    <p class="subtitle">MR-ilovalar uchun yagona akkaunt</p>
 
-  <script type="module" src="/modules/script.js"></script>
+    <div class="tabs">
+      <button class="tab active" id="tabLogin">Kirish</button>
+      <button class="tab" id="tabRegister">Ro'yxatdan o'tish</button>
+    </div>
+
+    <!-- Kirish formasi -->
+    <form id="loginForm" class="form">
+      <input type="email" id="loginEmail" placeholder="Email" required>
+      <input type="password" id="loginPassword" placeholder="Parol" required>
+      <button type="submit" class="btn" id="loginBtn">Kirish</button>
+    </form>
+
+    <!-- Ro'yxatdan o'tish formasi -->
+    <form id="registerForm" class="form" style="display:none">
+      <label class="avatar-pick" id="avatarPickLabel" for="avatarFile">
+        <span class="avatar-pick-inner" id="avatarPickInner">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+          </svg>
+          <span>Rasm qo'shing</span>
+        </span>
+        <img id="avatarPreview" style="display:none" alt="avatar">
+      </label>
+      <input type="file" id="avatarFile" accept="image/*" style="display:none">
+
+      <input type="text"     id="regName"     placeholder="To'liq ismingiz">
+      <input type="email"    id="regEmail"    placeholder="Email" required>
+      <input type="password" id="regPassword" placeholder="Parol (kamida 6 belgi)" required>
+      <button type="submit" class="btn" id="registerBtn">Ro'yxatdan o'tish</button>
+    </form>
+
+    <div id="authStatus" class="status"></div>
+  </div>
+</div>
+
+<!-- ── PROFIL SAHIFASI ───────────────────────────────────────────── -->
+<div id="pageProfile" class="page" style="display:none">
+  <div class="card profile-card">
+
+    <!-- Avatar + ism -->
+    <div class="profile-top">
+      <label class="avatar-wrap" for="avatarChangeInput" title="Rasmni o'zgartirish">
+        <img id="profileAvatar" class="profile-avatar" src="" alt="avatar" style="display:none">
+        <span class="avatar-fallback" id="profileFallback"></span>
+        <span class="avatar-edit-hint">✎</span>
+      </label>
+      <input type="file" id="avatarChangeInput" accept="image/*" style="display:none">
+      <div class="profile-name-wrap">
+        <div class="profile-name" id="profileName"></div>
+        <div class="profile-email" id="profileEmail"></div>
+      </div>
+    </div>
+
+    <!-- MRaccount ID — asosiy narsa -->
+    <div class="id-block">
+      <div class="id-label">MRaccount ID</div>
+      <div class="id-row">
+        <code class="id-value" id="profileId"></code>
+        <button class="copy-btn" id="copyIdBtn" title="Nusxa olish">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+        </button>
+      </div>
+      <div class="id-hint">
+        Boshqa MR-ilovalarda <strong>MRaccount ID</strong> so'ralganda shu qiymatni kiriting
+      </div>
+    </div>
+
+    <!-- Ism tahrirlash -->
+    <div class="edit-section">
+      <label class="field-label">To'liq ism</label>
+      <div class="edit-row">
+        <input type="text" id="editName" class="edit-input" placeholder="Ismingizni kiriting">
+        <button class="save-btn" id="saveNameBtn">Saqlash</button>
+      </div>
+    </div>
+
+    <button class="logout-btn" id="logoutBtn">Chiqish</button>
+  </div>
+</div>
+
+<script type="module" src="/modules/main.js"></script>
 </body>
 </html>

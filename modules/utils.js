@@ -1,18 +1,9 @@
-/**
- * MRaccount — utils.js
- * Kichik yordamchi funksiyalar
- */
-
 export const $ = id => document.getElementById(id);
 
 export function esc(str) {
-  if (str == null) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+  return String(str ?? '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 export function toast(msg, type = 'info') {
@@ -20,11 +11,12 @@ export function toast(msg, type = 'info') {
   if (!wrap) {
     wrap = document.createElement('div');
     wrap.id = 'toastWrap';
-    wrap.style.position = 'fixed';
-    wrap.style.bottom = '24px';
-    wrap.style.left = '50%';
-    wrap.style.transform = 'translateX(-50%)';
-    wrap.style.zIndex = '9999';
+    Object.assign(wrap.style, {
+      position: 'fixed', bottom: '24px', left: '50%',
+      transform: 'translateX(-50%)', zIndex: '9999',
+      display: 'flex', flexDirection: 'column', gap: '8px',
+      alignItems: 'center',
+    });
     document.body.appendChild(wrap);
   }
   const el = document.createElement('div');
@@ -32,4 +24,15 @@ export function toast(msg, type = 'info') {
   el.textContent = msg;
   wrap.appendChild(el);
   setTimeout(() => el.remove(), 3000);
+}
+
+export function copyToClipboard(text) {
+  navigator.clipboard?.writeText(text).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+  });
 }
