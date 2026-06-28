@@ -121,3 +121,74 @@ body {
 }
 .toast-success { border-color: #3fb950; }
 .toast-error   { border-color: #f85149; }
+
+/* ── Avatar upload ────────────────────────────────────────────────────── */
+.avatar-upload-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.avatar-upload-label {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  border: 2px dashed var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.2s;
+  background: var(--bg);
+  position: relative;
+}
+
+.avatar-upload-label:hover {
+  border-color: var(--accent);
+}
+
+.avatar-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  color: var(--text2);
+  font-size: 11px;
+  text-align: center;
+  padding: 4px;
+}
+
+.avatar-placeholder svg {
+  color: var(--text2);
+}
+
+.avatar-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+/* ── Profile avatar (boshqa ilovalar uchun) ───────────────────────────── */
+.mr-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--border);
+}
+
+.mr-avatar-fallback {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+}

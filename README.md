@@ -3,81 +3,90 @@
 MR-ilovalar (MRgram, MRtube, ...) uchun **mustaqil**, yagona akkaunt/SSO provider.
 
 ⚠️ Bu loyiha MRgram/MRtube kodiga yoki Firebase loyihasiga **hech qanday bog'liq emas**.
-O'zining alohida Firebase loyihasi va Vercel deploy'i bo'ladi: `mraccount.vercel.app`.
+
+## Yangilik: Profile Picture qo'llab-quvvatlash
+
+Foydalanuvchilar MRaccount'da ro'yxatdan o'tishda yoki keyinchalik profil avatarini yuklashlari mumkin. Avatar **Supabase Storage**'da saqlanadi va barcha MR-ilovalarga SSO orqali uzatiladi.
+
+### Supabase konfiguratsiyasi
+
+`modules/config.js` da:
+```js
+export const SUPABASE_URL    = 'https://olclnloqpxannznqtmvr.supabase.co';
+export const SUPABASE_KEY    = 'sb_publishable_S5hxl5otPP1m5PRQS8hedw_9AE1lcwG';
+export const SUPABASE_BUCKET = 'avatars';
+```
+
+### Supabase Storage sozlamasi
+
+Supabase Dashboard → Storage da **`avatars`** nomli bucket yarating:
+- **Public bucket** qilib belgilang (barcha ilovalar rasmni ko'ra olsin)
+- RLS Policy: `INSERT` va `UPDATE` faqat autentifikatsiyadan o'tgan foydalanuvchilarga
+
+### Avatar qanday ishlaydi?
+
+1. **Ro'yxatdan o'tishda**: Foydalanuvchi ixtiyoriy ravishda rasm tanlaydi → `registerUser()` avatar faylni `uploadAvatar(uid, file)` orqali Supabase'ga yuklaydi → URL Firestore'dagi `users/{uid}.avatarUrl` maydoniga saqlanadi.
+
+2. **SSO redirect'da**: `completeSsoRedirect()` Firestore'dan `avatarUrl`ni olib, callback URL'ga qo'shadi:
+   ```
+   https://yourapp.vercel.app/callback?token=...&avatar=<URL>&name=<ISM>
+   ```
+
+3. **Boshqa ilovalarda (MRgram, MRtube)**: Callback'dan `avatar` parametrini olib to'g'ridan-to'g'ri `<img>` da ko'rsating. Maxsus API kerak emas.
+
+4. **Console'da**: Header'da kirgan foydalanuvchining avatari ko'rsatiladi. Avatar rasmiga bosib yangi rasm yuklash mumkin.
+
+### Boshqa ilovalarda avatarni ko'rsatish namunasi
+
+```js
+// SSO callback sahifasida
+const params = new URLSearchParams(location.search);
+const token  = params.get('token');
+const avatar = params.get('avatar');
+const name   = params.get('name');
+
+if (avatar) {
+  document.getElementById('userAvatar').src = avatar;
+}
+```
 
 ## Fayl strukturasi
 
 ```
 MRaccount/
-├── index.html              # Login/register sahifasi
+├── index.html              # Login/register + avatar yuklash
 ├── modules/
-│   ├── config.js           # Firebase config (TODO: o'z key'laringizni qo'ying)
-│   ├── auth.js             # register/login/logout
-│   ├── sso.js              # Kelajakdagi SSO oqimi (hozircha skelet)
-│   ├── utils.js            # $ , esc, toast yordamchilari
+│   ├── config.js           # Firebase + Supabase konfiguratsiyasi
+│   ├── auth.js             # register/login/logout + updateAvatar
+│   ├── avatar.js           # Supabase Storage yuklash/olish (YANGI)
+│   ├── sso.js              # SSO oqimi (avatarUrl ham o'tkazadi)
+│   ├── utils.js            # $, esc, toast
 │   └── script.js           # UI <-> auth bog'lovchi
 ├── CSS/
-│   └── style.css
+│   └── style.css           # Avatar upload stillari ham bor
 ├── api/
-│   └── verify-token.js     # Boshqa ilovalar token tekshirishi uchun (hozircha 501)
+│   └── verify-token.js     # Token tekshirish (serverda)
+├── console/
+│   ├── index.html          # Console UI + avatar (header'da)
+│   ├── modules/
+│   │   └── console.js      # Ilovalar CRUD + avatar yangilash
+│   └── CSS/
+│       └── console.css
 ├── package.json
 └── vercel.json
 ```
 
-## Console (/console)
+## Deploy
 
-Dasturchilar `mraccount.vercel.app/console` orqali:
-1. MRaccount akkaunti bilan kirishadi (yoki ro'yxatdan o'tishadi).
-2. Ilova nomi va `redirect_uri`(lar)ni kiritib, yangi "ilova" yaratishadi.
-3. Tizim avtomatik `clientId` va `apiKey` generatsiya qilib beradi.
-4. Shu `clientId` va `redirect_uri`ni o'z ilovasidagi "MRaccount bilan kirish"
-   tugmasiga ulashadi:
-   ```
-   https://mraccount.vercel.app/?client_id=<clientId>&redirect_uri=<redirect_uri>
-   ```
-5. Foydalanuvchi shu tugmani bossa → MRaccount'ga tushadi → kiradi/ro'yxatdan
-   o'tadi → MRaccount avtomatik `redirect_uri?token=<ID_TOKEN>` ga qaytaradi.
-
-Bu oqim `modules/sso.js` (`validateSsoRequest`, `completeSsoRedirect`) va
-`console/modules/console.js` (ilovalarni Firestore'dagi `apps` kolleksiyasida
-saqlash) orqali ishlaydi — **hozir ishlaydigan holatda**, lekin productionga
-chiqarishdan oldin pastdagi xavfsizlik eslatmalarini ko'rib chiqing.
-
-### ⚠️ Xavfsizlik eslatmalari (muhim — hozirgi holat faqat skelet/demo darajasida)
-
-- `apps` kolleksiyasi hozircha **client tomondan to'g'ridan-to'g'ri** o'qiladi
-  (login sahifasi `client_id` bo'yicha so'rov yuboradi). Firestore rules buni
-  o'qishga ruxsat bersa, `apiKey` maydoni ham birga qaytadi va texnik jihatdan
-  ko'rinadigan bo'ladi. Productionda buni **serverless function** (`api/`)
-  orqali qilish kerak — shunda `apiKey` hech qachon brauzerga chiqmaydi.
-- `apiKey` hozircha hech qayerda haqiqiy autentifikatsiya uchun
-  ishlatilmaydi — u shunchaki generatsiya qilinib ko'rsatiladi. Real loyihada
-  bu key serverda (`api/verify-token.js` ichida) talab qilinishi va
-  tekshirilishi kerak.
-- Firestore Security Rules hali yozilmagan (default — hammaga yopiq bo'lishi
-  mumkin). Kamida quyidagilar kerak bo'ladi:
-  - `users/{uid}` — faqat egasi o'qiy/yoza oladi
-  - `apps` — yaratish/o'chirish faqat `ownerUid == request.auth.uid` bo'lsa;
-    o'qish (SSO tekshiruvi uchun) ehtiyotkorlik bilan sozlanishi kerak
-    (yuqoridagi eslatmaga qarang).
+1. Supabase'da `avatars` bucket yarating (public).
+2. Firebase Authentication → Email/Password yoqing.
+3. Firestore Database yarating, rules qo'ying.
+4. Vercel'da deploy qiling → `mraccount.vercel.app`.
+5. Firebase Console → Authorized domains → `mraccount.vercel.app` qo'shing.
 
 ## Keyingi qadamlar (TODO)
 
-1. ✅ Firebase config qo'shildi (`mrplatform-9cdc0` loyihasi).
-2. Firebase Console'da shu loyiha uchun **Authentication → Sign-in method →
-   Email/Password**ni yoqing (agar yoqilmagan bo'lsa).
-3. **Firestore Database** yarating (agar yo'q bo'lsa) va kerakli rules qo'ying.
-4. Vercel'da yangi loyiha yarating va shu papkani deploy qiling →
-   domen: `mraccount.vercel.app`.
-5. Deploy qilingandan keyin Firebase Console → Authentication →
-   **Settings → Authorized domains** ga `mraccount.vercel.app`ni qo'shing
-   (aks holda login xato beradi).
-6. SSO oqimini `modules/sso.js` va `api/verify-token.js` ichida to'liq yozish:
-   - `redirect_uri` / `client_id` whitelist
-   - Login muvaffaqiyatli bo'lganda token bilan boshqa ilovaga qaytarish
-   - `firebase-admin` orqali serverda tokenni tasdiqlash
-7. MRgram/MRtube tomonida "MRaccount bilan kirish" tugmasini qo'shish
-   (foydalanuvchini `mraccount.vercel.app?redirect_uri=...&client_id=...` ga yo'naltirish).
-
-Hozircha bu — **bo'sh skelet**: login/register ishlaydi, lekin SSO ulanishi
-va boshqa ilovalar bilan integratsiya hali yo'q.
+- [ ] Firestore Security Rules yozish
+- [ ] `api/verify-token.js` da `firebase-admin` bilan token tekshirish
+- [ ] Supabase RLS: faqat egasi o'z avatarini yuklaya olsin (UID bo'yicha)
+- [ ] Rasm o'lchamini client tomondan resize qilish (katta fayllar uchun)

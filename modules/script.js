@@ -18,9 +18,9 @@ if (clientId && redirectUri) {
   });
 }
 
-const tabLogin = $('tabLogin');
+const tabLogin    = $('tabLogin');
 const tabRegister = $('tabRegister');
-const loginForm = $('loginForm');
+const loginForm   = $('loginForm');
 const registerForm = $('registerForm');
 
 tabLogin.onclick = () => {
@@ -37,8 +37,25 @@ tabRegister.onclick = () => {
   loginForm.style.display = 'none';
 };
 
+// Avatar preview
+const avatarInput = $('regAvatar');
+const avatarPreview = $('avatarPreview');
+const avatarPlaceholder = $('avatarPlaceholder');
+
+avatarInput?.addEventListener('change', () => {
+  const file = avatarInput.files[0];
+  if (!file) return;
+  const url = URL.createObjectURL(file);
+  avatarPreview.src = url;
+  avatarPreview.style.display = 'block';
+  avatarPlaceholder.style.display = 'none';
+});
+
 loginForm.onsubmit = async e => {
   e.preventDefault();
+  const btn = loginForm.querySelector('.auth-btn');
+  btn.disabled = true;
+  btn.textContent = 'Kirilmoqda...';
   try {
     const user = await loginUser($('loginEmail').value.trim(), $('loginPassword').value);
     if (ssoApp) {
@@ -49,16 +66,24 @@ loginForm.onsubmit = async e => {
     }
   } catch (err) {
     toast('Xato: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Kirish';
   }
 };
 
 registerForm.onsubmit = async e => {
   e.preventDefault();
+  const btn = registerForm.querySelector('.auth-btn');
+  btn.disabled = true;
+  btn.textContent = "Ro'yxatdan o'tilmoqda...";
   try {
+    const avatarFile = avatarInput?.files[0] || null;
     const user = await registerUser(
       $('regEmail').value.trim(),
       $('regPassword').value,
-      $('regName').value.trim()
+      $('regName').value.trim(),
+      avatarFile
     );
     if (ssoApp) {
       toast("Ro'yxatdan o'tildi ✓, qaytarilmoqda...", 'success');
@@ -68,5 +93,8 @@ registerForm.onsubmit = async e => {
     }
   } catch (err) {
     toast('Xato: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Ro'yxatdan o'tish";
   }
 };

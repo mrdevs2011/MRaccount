@@ -18,13 +18,30 @@
         <button class="auth-tab" id="tabRegister">Ro'yxatdan o'tish</button>
       </div>
 
+      <!-- Kirish formasi -->
       <form id="loginForm" class="auth-form">
         <input type="email" id="loginEmail" placeholder="Email" required>
         <input type="password" id="loginPassword" placeholder="Parol" required>
         <button type="submit" class="auth-btn">Kirish</button>
       </form>
 
+      <!-- Ro'yxatdan o'tish formasi -->
       <form id="registerForm" class="auth-form" style="display:none">
+        <!-- Profile picture tanlash -->
+        <div class="avatar-upload-wrap">
+          <label for="regAvatar" class="avatar-upload-label" id="avatarLabel">
+            <span class="avatar-placeholder" id="avatarPlaceholder">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="8" r="4"/>
+                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+              </svg>
+              <span>Rasm tanlang</span>
+            </span>
+            <img id="avatarPreview" class="avatar-preview" style="display:none" alt="Avatar">
+          </label>
+          <input type="file" id="regAvatar" accept="image/*" style="display:none">
+        </div>
+
         <input type="text" id="regName" placeholder="To'liq ism">
         <input type="email" id="regEmail" placeholder="Email" required>
         <input type="password" id="regPassword" placeholder="Parol" required>

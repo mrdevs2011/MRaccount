@@ -9,7 +9,7 @@
 </head>
 <body>
 
-  <!-- AUTH GATE: kirish/ro'yxatdan o'tish (konsolga kirish uchun) -->
+  <!-- AUTH GATE -->
   <div class="auth-wrap" id="consoleAuthGate">
     <div class="auth-card">
       <h1 class="auth-logo">MRaccount Console</h1>
@@ -27,6 +27,20 @@
       </form>
 
       <form id="consoleRegisterForm" class="auth-form" style="display:none">
+        <!-- Avatar tanlash -->
+        <div class="avatar-upload-wrap">
+          <label for="cRegAvatar" class="avatar-upload-label" id="cAvatarLabel">
+            <span class="avatar-placeholder" id="cAvatarPlaceholder">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="8" r="4"/>
+                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+              </svg>
+              <span>Rasm tanlang</span>
+            </span>
+            <img id="cAvatarPreview" class="avatar-preview" style="display:none" alt="Avatar">
+          </label>
+          <input type="file" id="cRegAvatar" accept="image/*" style="display:none">
+        </div>
         <input type="text" id="cRegName" placeholder="To'liq ism">
         <input type="email" id="cRegEmail" placeholder="Email" required>
         <input type="password" id="cRegPassword" placeholder="Parol" required>
@@ -35,12 +49,20 @@
     </div>
   </div>
 
-  <!-- DASHBOARD: kirgandan keyin ko'rinadi -->
+  <!-- DASHBOARD -->
   <div class="console-dashboard" id="consoleDashboard" style="display:none">
     <header class="console-header">
       <div class="console-header-title">MRaccount Console</div>
       <div class="console-header-right">
-        <span id="consoleUserEmail" class="console-user-email"></span>
+        <!-- Profil avatar + ism -->
+        <div class="console-profile" id="consoleProfile">
+          <label for="consoleAvatarInput" class="console-avatar-wrap" title="Rasmni o'zgartirish">
+            <img id="consoleAvatar" class="console-avatar" src="" alt="Avatar" style="display:none">
+            <span class="console-avatar-fallback" id="consoleAvatarFallback"></span>
+          </label>
+          <input type="file" id="consoleAvatarInput" accept="image/*" style="display:none">
+          <span id="consoleUserEmail" class="console-user-email"></span>
+        </div>
         <button id="consoleLogoutBtn" class="console-logout-btn">Chiqish</button>
       </div>
     </header>

@@ -147,3 +147,53 @@
   padding: 6px 8px;
   border-radius: 6px;
 }
+
+/* ── Console header profil ────────────────────────────────────────────── */
+.console-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.console-avatar-wrap {
+  cursor: pointer;
+  display: block;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--border);
+  transition: border-color 0.2s;
+  flex-shrink: 0;
+}
+
+.console-avatar-wrap:hover {
+  border-color: var(--accent);
+}
+
+.console-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.console-avatar-fallback {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+/* SSO hint */
+.app-sso-hint code {
+  font-size: 11px;
+  word-break: break-all;
+}
