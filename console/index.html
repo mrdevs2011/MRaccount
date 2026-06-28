@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MRaccount Console — Dasturchilar uchun</title>
+<link rel="stylesheet" href="/CSS/style.css">
+<link rel="stylesheet" href="/console/CSS/console.css">
+</head>
+<body>
+
+  <!-- AUTH GATE: kirish/ro'yxatdan o'tish (konsolga kirish uchun) -->
+  <div class="auth-wrap" id="consoleAuthGate">
+    <div class="auth-card">
+      <h1 class="auth-logo">MRaccount Console</h1>
+      <p class="auth-sub">Dasturchilar uchun — ilovangizni ro'yxatdan o'tkazing</p>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="consoleTabLogin">Kirish</button>
+        <button class="auth-tab" id="consoleTabRegister">Ro'yxatdan o'tish</button>
+      </div>
+
+      <form id="consoleLoginForm" class="auth-form">
+        <input type="email" id="cLoginEmail" placeholder="Email" required>
+        <input type="password" id="cLoginPassword" placeholder="Parol" required>
+        <button type="submit" class="auth-btn">Kirish</button>
+      </form>
+
+      <form id="consoleRegisterForm" class="auth-form" style="display:none">
+        <input type="text" id="cRegName" placeholder="To'liq ism">
+        <input type="email" id="cRegEmail" placeholder="Email" required>
+        <input type="password" id="cRegPassword" placeholder="Parol" required>
+        <button type="submit" class="auth-btn">Ro'yxatdan o'tish</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- DASHBOARD: kirgandan keyin ko'rinadi -->
+  <div class="console-dashboard" id="consoleDashboard" style="display:none">
+    <header class="console-header">
+      <div class="console-header-title">MRaccount Console</div>
+      <div class="console-header-right">
+        <span id="consoleUserEmail" class="console-user-email"></span>
+        <button id="consoleLogoutBtn" class="console-logout-btn">Chiqish</button>
+      </div>
+    </header>
+
+    <main class="console-main">
+      <section class="console-section">
+        <h2>Yangi ilova qo'shish</h2>
+        <p class="console-hint">
+          Ilovangiz nomini va "MRaccount bilan kirish" muvaffaqiyatli bo'lgandan
+          keyin foydalanuvchi qaytishi kerak bo'lgan redirect URI(lar)ni kiriting
+          (har birini yangi qatorga yozing).
+        </p>
+        <form id="newAppForm" class="console-form">
+          <input type="text" id="newAppName" placeholder="Ilova nomi (masalan: MRgram)" required>
+          <textarea id="newAppRedirects" placeholder="https://mygram.vercel.app/auth/callback" rows="2" required></textarea>
+          <button type="submit" class="auth-btn">Ilova yaratish</button>
+        </form>
+      </section>
+
+      <section class="console-section">
+        <h2>Mening ilovalarim</h2>
+        <div id="appsList" class="apps-list">
+          <div class="console-empty">Yuklanmoqda...</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="/console/modules/console.js"></script>
+</body>
+</html>

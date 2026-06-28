@@ -1,0 +1,12 @@
+{
+  "name": "mraccount",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.7.0"
+  }
+}

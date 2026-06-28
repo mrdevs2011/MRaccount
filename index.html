@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MRaccount</title>
+<link rel="stylesheet" href="/CSS/style.css">
+</head>
+<body>
+
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <h1 class="auth-logo">MRaccount</h1>
+      <p class="auth-sub">MR-ilovalar uchun yagona akkaunt</p>
+
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin">Kirish</button>
+        <button class="auth-tab" id="tabRegister">Ro'yxatdan o'tish</button>
+      </div>
+
+      <form id="loginForm" class="auth-form">
+        <input type="email" id="loginEmail" placeholder="Email" required>
+        <input type="password" id="loginPassword" placeholder="Parol" required>
+        <button type="submit" class="auth-btn">Kirish</button>
+      </form>
+
+      <form id="registerForm" class="auth-form" style="display:none">
+        <input type="text" id="regName" placeholder="To'liq ism">
+        <input type="email" id="regEmail" placeholder="Email" required>
+        <input type="password" id="regPassword" placeholder="Parol" required>
+        <button type="submit" class="auth-btn">Ro'yxatdan o'tish</button>
+      </form>
+
+      <div id="authStatus" class="auth-status"></div>
+    </div>
+  </div>
+
+  <script type="module" src="/modules/script.js"></script>
+</body>
+</html>
